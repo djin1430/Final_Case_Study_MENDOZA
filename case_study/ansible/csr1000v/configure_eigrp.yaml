@@ -1,0 +1,56 @@
+---
+  - name: Configure EIGRP
+    hosts: routers
+    gather_facts: false
+    connection: local
+    vars:
+      cli:
+        username: cisco
+        password: cisco123!
+
+    tasks:
+      - name: Configure OSPF for TIP_MANILA
+        when: ansible_host == "10.0.0.6"
+        ios_config:
+          provider: "{{ cli }}"
+          parents: router eigrp 1
+          lines:
+            - network 10.0.0.4 
+            - network 192.168.1.0
+
+      - name: Configure OSPF for TIP_QC
+        when: ansible_host == "192.168.0.1"
+        ios_config:
+          provider: "{{ cli }}"
+          parents: router eigrp 1
+          lines:
+            - network 10.0.0.0
+            - network 192.168.0.0
+
+      - name: Configure OSPF for Admin
+        when: ansible_host == "10.0.0.2"
+        ios_config:
+          provider: "{{ cli }}"
+          parents: router eigrp 1
+          lines:
+            - network 10.0.0.0
+            - network 10.0.0.4
+
+
+      - name: print ip route
+        ios_command:
+          provider: "{{ cli }}"
+          commands:
+            - show ip eigrp neighbors
+        register: config
+
+      - name: SAVE OUTPUT TO ./iosconfig/ 
+        copy:
+          content: "{{config.stdout[0]}}"
+          dest: "iosconfig/showipeigrp{{inventory_hostname}}.txt"
+
+      - name: Save Configuration
+        ios_config:
+          provider: "{{ cli }}"
+          lines:
+            - do write

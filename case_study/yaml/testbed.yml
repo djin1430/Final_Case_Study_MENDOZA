@@ -1,0 +1,40 @@
+devices:
+  ADMIN:
+    connections:
+      cli:
+        ip: 10.0.0.2
+        protocol: ssh
+    credentials:
+      default:
+        password: '%ENC{w5PDosOUw5fDosKQwpbCmMKH}'
+        username: cisco
+      enable:
+        password: '%ASK{}'
+    os: iosxe
+    type: iosxe
+  TIP_MANILA:
+    connections:
+      cli:
+        ip: 10.0.0.6
+        protocol: ssh
+    credentials:
+      default:
+        password: '%ENC{w5PDosOUw5fDosKQwpbCmMKH}'
+        username: cisco
+      enable:
+        password: '%ASK{}'
+    os: iosxe
+    type: iosxe
+  TIP_QC:
+    connections:
+      cli:
+        ip: 192.168.0.1
+        protocol: ssh
+    credentials:
+      default:
+        password: '%ENC{w5PDosOUw5fDosKQwpbCmMKH}'
+        username: cisco
+      enable:
+        password: '%ASK{}'
+    os: iosxe
+    type: iosxe

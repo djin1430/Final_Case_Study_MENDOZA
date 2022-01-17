@@ -1,0 +1,43 @@
+---
+  - name: Configure Standard ACL
+    hosts: TIP_MANILA
+    gather_facts: false
+    connection: local
+    vars:
+      cli:
+        username: cisco
+        password: cisco123!
+
+    tasks:
+      - name: Deny TIP_QC network
+        ios_config:
+          provider: "{{ cli }}"
+          parents: ip access-list extended ACL-TIP-MANILA
+          lines:
+            - 10 deny icmp 192.168.1.0 0.0.0.255 any
+            - 20 permit ip any any
+
+      - name: Apply in S0/1
+        ios_config:
+          provider: "{{ cli }}"
+          parents: interface s0/1
+          lines:
+            - ip access-group ACL-TIP-MANILA in
+
+      - name: Save Configuration
+        ios_config:
+          provider: "{{ cli }}"
+          lines:
+            - do write
+
+      - name: print ip route
+        ios_command:
+          provider: "{{ cli }}"
+          commands:
+            - show ip access-lists
+        register: config
+
+      - name: SAVE OUTPUT TO ./iosconfig/ 
+        copy:
+          content: "{{config.stdout[0]}}"
+          dest: "iosconfig/show_ip_accesslists_tipmanila{{inventory_hostname}}.txt"
